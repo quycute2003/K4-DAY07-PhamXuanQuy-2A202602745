@@ -56,15 +56,15 @@ Giải thích cách tiếp cận của bạn khi lập trình (implement) các p
 ### Lớp EmbeddingStore
 
 **`add_documents` + `search`** — hướng tiếp cận:
-> *Viết 2-3 câu: lưu trữ thế nào? Tính độ tương tự ra sao?*
+> `add_documents` coi mỗi `Document` là một record đã được chunk ở tầng ngoài, copy metadata, bảo đảm có `doc_id`, tạo embedding cho `content` rồi lưu in-memory. `search` tạo embedding cho query và chuyển toàn bộ ứng viên qua `_search_records`, dùng dot product để xếp hạng giảm dần; vì embedding đã chuẩn hóa nên dot product tương đương cosine similarity. Kết quả chỉ trả `id`, `content`, metadata và score, không trả vector embedding.
 
 **`search_with_filter` + `delete_document`** — hướng tiếp cận:
-> *Viết 2-3 câu: lọc (filter) trước hay sau? Xóa bằng cách nào?*
+> `search_with_filter` lọc metadata trên toàn bộ store trước, sau đó mới xếp hạng top-k bằng cùng helper với `search`; cách này tránh để tài liệu sai đối tượng chiếm các vị trí top-k. `delete_document` loại tất cả record có `metadata["doc_id"]` khớp tài liệu gốc, vì vậy xóa được đồng thời mọi chunk như `file#0`, `file#1`, và trả `True` chỉ khi kích thước store thực sự giảm.
 
 ### Tác tử KnowledgeBaseAgent
 
 **`answer`** — hướng tiếp cận:
-> *Viết 2-3 câu: cấu trúc prompt? Cách đưa ngữ cảnh (inject context) vào thế nào?*
+> `answer` truy xuất top-k, đánh số từng chunk `[1]`, `[2]`, `[3]` và đính kèm `title` cùng `source_url` hoặc `doc_id` trước nội dung. Prompt yêu cầu chỉ sử dụng ngữ cảnh, trích dẫn theo số nguồn và nói rõ khi tài liệu không đủ thông tin để hạn chế bịa đặt. Nếu store không trả kết quả, agent trả thông báo trực tiếp và không gọi LLM.
 
 ---
 
@@ -75,10 +75,26 @@ Vượt qua bộ kiểm thử là điều kiện tính điểm phần này.
 ### Kết Quả Kiểm Thử (Test Results)
 
 ```
-# Dán kết quả (output) của: pytest tests/ -v
+============================= test session starts =============================
+platform win32 -- Python 3.11.4, pytest-9.0.3
+collected 42 items
+
+TestProjectStructure                                  2 passed
+TestClassBasedInterfaces                              2 passed
+TestFixedSizeChunker                                  7 passed
+TestSentenceChunker                                   4 passed
+TestRecursiveChunker                                  4 passed
+TestEmbeddingStore                                    8 passed
+TestKnowledgeBaseAgent                                2 passed
+TestComputeSimilarity                                 4 passed
+TestCompareChunkingStrategies                         3 passed
+TestEmbeddingStoreSearchWithFilter                    3 passed
+TestEmbeddingStoreDeleteDocument                      3 passed
+
+============================= 42 passed in 0.24s ==============================
 ```
 
-**Số lượng bài test vượt qua (pass):** __ / 42
+**Số lượng bài test vượt qua (pass):** 42 / 42
 
 ---
 
