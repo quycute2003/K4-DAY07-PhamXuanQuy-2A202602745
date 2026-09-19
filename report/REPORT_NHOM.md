@@ -1,8 +1,8 @@
 # Báo Cáo Nhóm — Lab 7: Embedding & Vector Store
 
-**Nhóm:** [Tên nhóm]
-**Thành viên:** [Họ tên từng thành viên]
-**Ngày:** [Ngày nộp]
+**Nhóm:** Shopee Return & Refund
+**Thành viên:** Phạm Xuân Quý (2A202602745), [Thành viên 2], [Thành viên 3]
+**Ngày:** 2026-09-19
 
 > **Nộp 1 bản / nhóm.** Phần cá nhân (hướng tiếp cận, kết quả riêng, dự đoán…) mỗi thành viên nộp riêng trong `REPORT_CANHAN.md`. Chi tiết thang điểm: `docs/SCORING.md`.
 
@@ -14,31 +14,38 @@
 
 ### Chủ đề (Domain) & Lý Do Chọn
 
-**Chủ đề:** [ví dụ: Customer support FAQ, Luật Việt Nam, công thức nấu ăn, ...]
+**Chủ đề:** Quy trình Trả hàng/Hoàn tiền trên Shopee Việt Nam dành cho Người mua và Người bán.
 
 **Tại sao nhóm chọn chủ đề này?**
-> *Viết 2-3 câu:*
+> Chủ đề có nhiều điều kiện, ngoại lệ, thời hạn và quy trình cụ thể nên phù hợp để đánh giá chất lượng retrieval. Việc có tài liệu dành cho cả người mua và người bán cũng giúp nhóm kiểm chứng tác dụng của metadata filtering, đặc biệt khi cùng một câu hỏi có thể truy xuất nhầm mốc thời gian của đối tượng khác.
 
 ### Danh sách tài liệu (Data Inventory)
 
 | # | Tên tài liệu | Nguồn (Source URL) | Ngày lấy / Phiên bản | Số ký tự | Metadata đã gán |
 |---|--------------|------------|--------------------|----------|-----------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | Quy định chung về trả hàng và hoàn tiền | [Shopee #188931](https://help.shopee.vn/portal/4/article/188931) | 2026-09-19 / `not-stated` | 6.050 | `audience: buyer`, `category: return-conditions`, `language: vi` |
+| 2 | Hướng dẫn gửi yêu cầu trả hàng và hoàn tiền | [Shopee #79233](https://help.shopee.vn/portal/4/article/79233) | 2026-09-19 / `not-stated` | 2.272 | `audience: buyer`, `category: return-request-process`, `language: vi` |
+| 3 | Quy trình xử lý yêu cầu trả hàng và hoàn tiền | [Shopee #190242](https://help.shopee.vn/portal/4/article/190242) | 2026-09-19 / `not-stated` | 7.846 | `audience: buyer`, `category: dispute-process`, `language: vi` |
+| 4 | Thời gian nhận tiền hoàn và cách kiểm tra | [Shopee #189473](https://help.shopee.vn/portal/4/article/189473) | 2026-09-19 / `not-stated` | 3.632 | `audience: buyer`, `category: refund-timeline`, `language: vi` |
+| 5 | Nghĩa vụ người bán Shopee Mall khi xử lý trả hàng | [Shopee #77262](https://help.shopee.vn/portal/4/article/77262) | 2026-09-19 / `effective-2026-05-08` | 4.101 | `audience: seller`, `category: seller-return-obligations`, `language: vi` |
+| 6 | Quyền và nghĩa vụ người bán trên Shopee | [Shopee #77245](https://help.shopee.vn/portal/4/article/77245) | 2026-09-19 / `updated-2025-01-03` | 3.822 | `audience: seller`, `category: seller-rights-and-duties`, `language: vi` |
 
 **Danh sách kiểm tra quản trị dữ liệu (Data governance checklist):**
-- [ ] Tập tài liệu (Corpus) chỉ chứa nguồn công khai/được phép dùng và không chứa dữ liệu cá nhân, thông tin đăng nhập hoặc tài liệu nội bộ.
-- [ ] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` (hoặc ngày hiệu lực) trong metadata.
+- [x] Tập tài liệu (Corpus) chỉ chứa nguồn công khai/được phép dùng và không chứa dữ liệu cá nhân, thông tin đăng nhập hoặc tài liệu nội bộ.
+- [x] Mỗi tài liệu có `source_url`, `retrieved_at`, `document_version` (hoặc ngày hiệu lực) trong metadata.
 
 ### Cấu trúc Metadata (Metadata Schema)
 
 | Trường metadata | Kiểu | Ví dụ giá trị | Tại sao hữu ích cho truy xuất (retrieval)? |
 |----------------|------|---------------|-------------------------------|
-| | | | |
-| | | | |
+| `doc_id` | String duy nhất | `buyer-return-conditions` | Liên kết chunk với tài liệu nguồn và hỗ trợ xóa toàn bộ chunk của một tài liệu. |
+| `title` | String | `Quy định chung về trả hàng và hoàn tiền` | Giúp nhận diện tài liệu và hiển thị nguồn dễ hiểu trong kết quả. |
+| `source_url` | URL | `https://help.shopee.vn/portal/4/article/188931` | Cho phép truy vết và kiểm chứng nội dung tại nguồn chính thức. |
+| `retrieved_at` | Ngày `YYYY-MM-DD` | `2026-09-19` | Cho biết thời điểm nhóm thu thập dữ liệu và hỗ trợ đánh giá độ mới. |
+| `document_version` | String | `effective-2026-05-08` | Phân biệt phiên bản hoặc ngày hiệu lực của chính sách; dùng `not-stated` khi nguồn không nêu. |
+| `audience` | Enum | `buyer`, `seller` | Lọc đúng tài liệu dành cho người mua hoặc người bán, tránh nhầm điều kiện và thời hạn. |
+| `category` | String | `refund-timeline` | Thu hẹp tìm kiếm theo loại thông tin như điều kiện, quy trình, thời hạn hoặc nghĩa vụ. |
+| `language` | String | `vi` | Hỗ trợ lọc theo ngôn ngữ khi corpus được mở rộng. |
 
 ---
 

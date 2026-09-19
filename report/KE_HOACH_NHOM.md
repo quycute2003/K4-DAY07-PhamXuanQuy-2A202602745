@@ -32,7 +32,7 @@ Nhóm cần hoàn thành hai phần song song:
 
 | Thành viên | Họ tên | Vai trò điều phối | Chiến lược riêng |
 |---|---|---|---|
-| Người 1 | `[Điền tên]` | R1 — Data Lead | `FixedSizeChunker` có overlap |
+| Người 1 | Phạm Xuân Quý — 2A202602745 | R1 — Data Lead | `FixedSizeChunker` có overlap |
 | Người 2 | `[Điền tên]` | R2 — Benchmark Lead | `RecursiveChunker` |
 | Người 3 | `[Điền tên]` | R3 — Strategy Lead | Custom chunker theo heading/section |
 
@@ -391,4 +391,3 @@ Bài chỉ được xem là hoàn thành khi:
 - Báo cáo giải thích được **tại sao** một chiến lược tốt hơn, không chỉ liệt kê điểm.
 - Phân biệt rõ phần chung của nhóm và đóng góp cá nhân.
 - Không có API key, dữ liệu cá nhân hoặc tài liệu không được phép chia sẻ trong Git.
-
