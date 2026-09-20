@@ -102,7 +102,7 @@ for section in sections:
 
 **Thành viên 4 — Nguyễn Hoàng Tuyên (2A202602439)**
 - **Loại chiến lược:** SentenceChunker (`max_sentences_per_chunk=3`)
-- **Mô tả & lý do chọn:** Gom các câu hoàn chỉnh giúp hạn chế cắt mất dấu câu và giữ nội dung dễ đọc. Do máy của Tuyên gặp lỗi môi trường khi chạy embedding thật, nhóm chạy lại cấu hình SentenceChunker bằng cùng corpus, cùng 5 query và embedding `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`; kết quả tạo 46 chunk, đạt **3/10** (truy xuất đúng tài liệu 4/5 câu, có bằng chứng trả lời trong top-3 ở 2/5 câu). Các câu pháp lý dài hoặc thông tin nằm ở nhiều mục vẫn có thể khiến chunk đúng không lọt top-3.
+- **Mô tả & lý do chọn:** Gom các câu hoàn chỉnh giúp hạn chế cắt mất dấu câu và giữ nội dung dễ đọc. Tuyên chạy cấu hình SentenceChunker trên cùng corpus, cùng 5 query và embedding `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`; kết quả tạo 46 chunk, đạt **3/10** (truy xuất đúng tài liệu 4/5 câu, có bằng chứng trả lời trong top-3 ở 2/5 câu). Các câu pháp lý dài hoặc thông tin nằm ở nhiều mục vẫn có thể khiến chunk đúng không lọt top-3.
 - **Code snippet (nếu custom):** Không áp dụng; sử dụng `SentenceChunker` trong `src/chunking.py`.
 
 ### So Sánh Giữa Các Thành Viên
@@ -112,10 +112,10 @@ for section in sections:
 | Phạm Xuân Quý | FixedSizeChunker (1000/500) | 5/10 — đã xác minh | Kích thước ổn định; overlap lớn giữ được bảng thời gian hoàn tiền và thông tin ở biên. | Có thể trộn nhiều ý trong chunk và trả đúng tài liệu nhưng sai mục. |
 | Nguyễn Minh Thịnh | RecursiveChunker (1000) | 4/10 — đã xác minh | Giữ ranh giới đoạn/câu tốt hơn và dùng ít chunk nhất (32). | Không có overlap; một số bằng chứng ở biên chỉ có một cơ hội lọt top-3. |
 | Vũ Minh Điềm | HeadingChunker (1000) | 7/10 — đã xác minh | Heading cung cấp ngữ cảnh chủ đề; điều khoản và tiêu đề thường đi cùng nhau. | Các câu hỏi cần tổng hợp nhiều section, như hai cách gửi yêu cầu, vẫn có thể thất bại. |
-| Nguyễn Hoàng Tuyên | SentenceChunker (3 câu/chunk) | 3/10 — nhóm chạy lại do lỗi môi trường | Giữ nguyên câu và dấu câu; chunk dễ đọc. | Câu pháp lý dài tạo chunk lớn, trong khi thông tin ở nhiều section khó được gom đủ vào top-3. |
+| Nguyễn Hoàng Tuyên | SentenceChunker (3 câu/chunk) | 3/10 — Tuyên đã chạy và xác minh | Giữ nguyên câu và dấu câu; chunk dễ đọc. | Câu pháp lý dài tạo chunk lớn, trong khi thông tin ở nhiều section khó được gom đủ vào top-3. |
 
 **Chiến lược nào tốt nhất cho chủ đề này? Tại sao?**
-> Trong các lượt chạy đã xác minh/chạy lại trên cùng cấu hình nhóm, HeadingChunker của Điềm tốt nhất với **7/10**, cao hơn FixedSize của Quý (**5/10**), Recursive của Thịnh (**4/10**) và SentenceChunker của Tuyên (**3/10**). Cấu trúc heading của tài liệu Shopee đã thể hiện ranh giới ngữ nghĩa do người biên soạn đặt ra; giữ tiêu đề cùng nội dung giúp embedding phân biệt đúng điều khoản, đặc biệt ở các câu hỏi về thời hạn và nghĩa vụ.
+> Trong các lượt chạy do từng thành viên thực hiện và đã xác minh trên cùng corpus, HeadingChunker của Điềm tốt nhất với **7/10**, cao hơn FixedSize của Quý (**5/10**), Recursive của Thịnh (**4/10**) và SentenceChunker của Tuyên (**3/10**). Cấu trúc heading của tài liệu Shopee đã thể hiện ranh giới ngữ nghĩa do người biên soạn đặt ra; giữ tiêu đề cùng nội dung giúp embedding phân biệt đúng điều khoản, đặc biệt ở các câu hỏi về thời hạn và nghĩa vụ.
 
 ---
 
@@ -163,7 +163,7 @@ for section in sections:
 > Với câu “Một yêu cầu hoàn tiền cần được phản hồi trong bao lâu?”, filter `audience=seller` đã loại tài liệu người mua nhưng top-3 lần lượt chứa các mốc 07 ngày nhận hàng hoàn, 02 ngày khiếu nại hàng hư hại và 05 ngày xử lý. Đoạn đúng về “Hoàn Tiền Ngay” không có đủ bằng chứng trong top-3 vì FixedSize cắt tiêu đề và nội dung liên quan sang các chunk khác nhau. Cách sửa đề xuất là tách theo heading, gắn lại heading vào mọi chunk con, rồi dùng reranker hoặc kết hợp từ khóa “phản hồi” với cosine.
 
 **Bài học rút ra khi so sánh trong nhóm:**
-> Trên cùng corpus và embedding thật trong các lượt chạy đã xác minh/chạy lại, HeadingChunker đạt 7/10 vì tận dụng cấu trúc có sẵn của tài liệu, trong khi FixedSize đạt 5/10 nhờ overlap, Recursive đạt 4/10 và SentenceChunker đạt 3/10. Kết quả cho thấy ít chunk hơn hoặc giữ nguyên câu chưa chắc retrieval tốt hơn; ranh giới chunk có khớp với đơn vị ý nghĩa của tài liệu hay không mới là yếu tố quyết định.
+> Trên cùng corpus và embedding thật trong các lượt chạy do từng thành viên thực hiện, HeadingChunker đạt 7/10 vì tận dụng cấu trúc có sẵn của tài liệu, trong khi FixedSize đạt 5/10 nhờ overlap, Recursive đạt 4/10 và SentenceChunker của Tuyên đạt 3/10. Kết quả cho thấy ít chunk hơn hoặc giữ nguyên câu chưa chắc retrieval tốt hơn; ranh giới chunk có khớp với đơn vị ý nghĩa của tài liệu hay không mới là yếu tố quyết định.
 
 **Nếu làm lại, nhóm sẽ thay đổi gì trong chiến lược dữ liệu (data strategy)?**
 > Nhóm nên giữ metadata `audience` nhưng bổ sung `section_title` và `policy_type` cho từng chunk. Với tài liệu quy định có cấu trúc rõ, tách theo heading trước rồi dùng RecursiveChunker cho section quá dài sẽ giữ điều khoản và mốc thời gian gần nhau hơn FixedSize thuần túy.
