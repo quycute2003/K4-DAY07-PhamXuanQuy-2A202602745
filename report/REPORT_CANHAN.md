@@ -102,14 +102,14 @@ TestEmbeddingStoreDeleteDocument                      3 passed
 
 | Cặp | Câu A | Câu B | Dự đoán | Điểm thực tế | Đúng? |
 |------|-----------|-----------|---------|--------------|-------|
-| 1 | | | cao / thấp | | |
-| 2 | | | cao / thấp | | |
-| 3 | | | cao / thấp | | |
-| 4 | | | cao / thấp | | |
-| 5 | | | cao / thấp | | |
+| 1 | Shopee hiện chưa hỗ trợ yêu cầu đổi hàng. | Nền tảng hiện không cung cấp hình thức đổi sản phẩm. | Cao | 0,5511 | Có |
+| 2 | Tiền hoàn về thẻ tín dụng mất từ 7 đến 14 ngày làm việc. | Khoản hoàn trả vào thẻ cần khoảng một đến hai tuần tùy ngân hàng. | Cao | 0,6880 | Có |
+| 3 | Người bán có 2 ngày để phản hồi yêu cầu Hoàn Tiền Ngay. | Nhà bán hàng phải trả lời yêu cầu hoàn tiền tức thời trong vòng 48 giờ. | Cao | 0,6301 | Có |
+| 4 | Người mua có thể gửi yêu cầu trả hàng và hoàn tiền. | Người bán phải đóng gói sản phẩm đúng quy cách trước khi giao hàng. | Thấp | 0,6170 | Không |
+| 5 | Thực phẩm tươi sống phải được yêu cầu trả hàng trong 24 giờ. | Thời tiết Hà Nội hôm nay có nắng và ít mây. | Thấp | 0,0816 | Có |
 
 **Kết quả nào bất ngờ nhất? Điều này nói gì về cách embeddings biểu diễn ý nghĩa?**
-> *Viết 2-3 câu:*
+> Cặp 4 bất ngờ nhất vì hai câu nói về hai hành động khác nhau nhưng vẫn đạt 0,6170. Điều này cho thấy embedding không chỉ biểu diễn ý chính cần trả lời mà còn giữ mạnh ngữ cảnh chung như người mua, người bán, sản phẩm và giao dịch; vì vậy cosine cao chưa bảo đảm đoạn văn chứa đúng bằng chứng cần thiết.
 
 ---
 
@@ -119,16 +119,18 @@ Chạy **5 câu hỏi đánh giá của nhóm** trên mã nguồn cá nhân củ
 
 | # | Câu hỏi (Query) | Top-1 Chunk truy xuất được (tóm tắt) | Điểm Score | Có liên quan không? (Relevant) | Câu trả lời của Agent (tóm tắt) |
 |---|-------|--------------------------------|-------|-----------|------------------------|
-| 1 | | | | | |
-| 2 | | | | | |
-| 3 | | | | | |
-| 4 | | | | | |
-| 5 | | | | | |
+| 1 | Thời hạn yêu cầu với thực phẩm tươi sống/đông lạnh? | `buyer-return-conditions#1`: nêu đúng mốc 24 giờ sau “Giao hàng thành công”. | 0,6827 | Có — đúng ngay top-1 | 24 giờ, trừ lý do chưa nhận được hàng; có căn cứ trong chunk [1]. |
+| 2 | Shopee có đổi hàng không và người mua xử lý hàng có vấn đề thế nào? | `buyer-return-processing#9`: lưu ý xử lý sai sót và liên hệ CSKH, không trả lời trực tiếp việc đổi hàng. | 0,6367 | Top-1 không; chunk đúng ở top-2 | Không hỗ trợ đổi hàng; có thể từ chối khi đồng kiểm hoặc gửi yêu cầu trả hàng/hoàn tiền, dựa trên chunk top-2. |
+| 3 | Có những cách nào để gửi yêu cầu trả hàng/hoàn tiền? | `buyer-return-processing#10`: nói về phản hồi đề xuất và khiếu nại, không liệt kê hai cách gửi. | 0,6444 | Không — bằng chứng vắng top-3 | Không đủ ngữ cảnh để liệt kê chính xác hai cách gửi yêu cầu. |
+| 4 | Hoàn tiền về thẻ tín dụng/ghi nợ mất bao lâu? | `buyer-refund-timeline#0`: bảng phương thức và thời gian hoàn tiền, có dòng 7–14 ngày. | 0,7422 | Có — đúng ngay top-1 | 7–14 ngày làm việc, tùy ngân hàng; có căn cứ trong chunk [1]. |
+| 5 | Một yêu cầu hoàn tiền cần được phản hồi trong bao lâu? | `seller-mall-return-obligations#3`: nghĩa vụ nhận sản phẩm hoàn trả trong 7 ngày, không phải phản hồi “Hoàn Tiền Ngay”. | 0,5290 | Không — đúng tài liệu nhưng sai đoạn | Không đủ ngữ cảnh để kết luận mốc 02 ngày cho “Hoàn Tiền Ngay”; các chunk top-3 chứa những mốc khác. |
 
-**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** __ / 5
+**Bao nhiêu câu hỏi trả về chunk có liên quan trong top-3?** 3 / 5. Điểm theo rubric: **5/10** (câu 1: 2đ, câu 2: 1đ, câu 3: 0đ, câu 4: 2đ, câu 5: 0đ).
+
+> Cấu hình cá nhân: `FixedSizeChunker(chunk_size=1000, overlap=500)`, 53 chunk, embedding `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`. Câu trả lời được đánh giá theo bằng chứng thật có trong ngữ cảnh top-3; khi thiếu bằng chứng, agent phải báo tài liệu chưa đủ thay vì suy đoán.
 
 **Điều hay nhất tôi học được từ thành viên khác / nhóm khác (qua demo):**
-> *Viết 2-3 câu:*
+> Qua so sánh bốn chiến lược, tôi học được rằng HeadingChunker phù hợp nhất với tài liệu chính sách có cấu trúc mục rõ ràng. Việc giữ tiêu đề cùng điều khoản giúp truy xuất đúng ngữ cảnh hơn so với chỉ dựa vào kích thước, ranh giới câu hoặc separator chung.
 
 ---
 
@@ -136,9 +138,9 @@ Chạy **5 câu hỏi đánh giá của nhóm** trên mã nguồn cá nhân củ
 
 | Tiêu chí | Điểm tự đánh giá |
 |----------|-------------------|
-| Khởi động (Warm-up) | / 5 |
-| Hướng tiếp cận của tôi (My Approach) | / 10 |
-| Hoàn thiện code (Core Implementation — tests) | / 30 |
-| Dự đoán độ tương tự (Similarity Predictions) | / 5 |
-| Kết quả truy xuất của tôi (Competition Results) | / 10 |
-| **Tổng phần cá nhân** | **/ 60** |
+| Khởi động (Warm-up) | 5 / 5 |
+| Hướng tiếp cận của tôi (My Approach) | 10 / 10 |
+| Hoàn thiện code (Core Implementation — tests) | 30 / 30 |
+| Dự đoán độ tương tự (Similarity Predictions) | 5 / 5 |
+| Kết quả truy xuất của tôi (Competition Results) | 5 / 10 |
+| **Tổng phần cá nhân** | **55 / 60** |

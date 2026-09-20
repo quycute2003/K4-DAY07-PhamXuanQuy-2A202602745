@@ -1,4 +1,4 @@
-# Kế Hoạch Nhóm 3 Người — Lab 7: Embedding & Vector Store
+# Kế Hoạch Nhóm 4 Người — Lab 7: Embedding & Vector Store
 
 ## 1. Mục tiêu chung
 
@@ -8,7 +8,7 @@
 Nhóm cần hoàn thành hai phần song song:
 
 1. **Phần cá nhân (60 điểm/người):** mỗi thành viên tự hoàn thiện code trong `src/`, chạy test, chạy benchmark bằng chiến lược riêng và viết `REPORT_CANHAN.md`.
-2. **Phần nhóm (40 điểm):** cùng xây dựng corpus 5–10 tài liệu, thống nhất 5 benchmark query, so sánh ba chiến lược và hoàn thiện `REPORT_NHOM.md`.
+2. **Phần nhóm (40 điểm):** cùng xây dựng corpus 5–10 tài liệu, thống nhất 5 benchmark query, so sánh bốn chiến lược và hoàn thiện `REPORT_NHOM.md`.
 
 ### Sản phẩm cuối cùng
 
@@ -18,7 +18,7 @@ Nhóm cần hoàn thành hai phần song song:
 - [ ] `sources.csv` khớp một-một với các file tài liệu.
 - [ ] Có đúng 5 benchmark query và 5 gold answer kiểm chứng được từ corpus.
 - [ ] Ít nhất một query cần lọc `audience: buyer` hoặc `audience: seller`.
-- [ ] Ba thành viên dùng ba chiến lược chunking khác nhau.
+- [ ] Bốn thành viên dùng bốn chiến lược chunking khác nhau.
 - [ ] Có ít nhất một chiến lược chunk theo heading/section.
 - [ ] Hoàn thiện một `REPORT_NHOM.md` chung.
 - [ ] Mỗi thành viên hoàn thiện một `REPORT_CANHAN.md` riêng.
@@ -33,10 +33,11 @@ Nhóm cần hoàn thành hai phần song song:
 | Thành viên | Họ tên | Vai trò điều phối | Chiến lược riêng |
 |---|---|---|---|
 | Người 1 | Phạm Xuân Quý — 2A202602745 | R1 — Data Lead | `FixedSizeChunker` có overlap |
-| Người 2 | `[Điền tên]` | R2 — Benchmark Lead | `RecursiveChunker` |
-| Người 3 | `[Điền tên]` | R3 — Strategy Lead | Custom chunker theo heading/section |
+| Người 2 | Nguyễn Minh Thịnh — 2A202602556 | R2 — Benchmark Lead | `RecursiveChunker` |
+| Người 3 | Vũ Minh Điềm — 2A202602858 | R3 — Strategy Lead | Custom chunker theo heading/section |
+| Người 4 | Nguyễn Hoàng Tuyên — 2A202602439 | R4 — Evaluation & Report Lead | `SentenceChunker` |
 
-> Vai trò R1/R2/R3 là trách nhiệm điều phối thêm. Cả ba người vẫn phải tự hoàn thiện toàn bộ phần code cá nhân trong `src/` và tự chạy 5 benchmark query.
+> Vai trò R1/R2/R3/R4 là trách nhiệm điều phối thêm. Cả bốn người vẫn phải tự hoàn thiện toàn bộ phần code cá nhân trong `src/` và tự chạy 5 benchmark query.
 
 ---
 
@@ -48,6 +49,7 @@ Nhóm cần hoàn thành hai phần song song:
 - `member-1`: code và báo cáo cá nhân của Người 1.
 - `member-2`: code và báo cáo cá nhân của Người 2.
 - `member-3`: code và báo cáo cá nhân của Người 3.
+- `member-4`: code và báo cáo cá nhân của Người 4.
 
 Mỗi thành viên tạo nhánh riêng:
 
@@ -63,6 +65,7 @@ Thay `member-1` bằng nhánh tương ứng. Không push trực tiếp lên `mai
 - R1 là người merge thay đổi trong `data/shopee-return-refund/` và `sources.csv`.
 - R2 là người merge bảng benchmark trong `REPORT_NHOM.md`.
 - R3 là người merge bảng so sánh chiến lược và kết quả baseline.
+- R4 là người rà soát failure case, hoàn thiện báo cáo và chuẩn bị demo.
 - Không merge file `src/` cá nhân của người này đè lên code của người khác.
 - Trước khi làm việc, chạy `git pull`; trước khi push, kiểm tra `git status` và chạy test.
 - Không commit `.env`, API key, dữ liệu cá nhân hoặc nội dung sau đăng nhập.
@@ -131,7 +134,7 @@ language: vi
 - Ghi `doc_id` hoặc chunk chứa căn cứ của từng gold answer.
 - Đảm bảo câu hỏi đa dạng: điều kiện, thời hạn, quy trình, bằng chứng và nghĩa vụ.
 - Thiết kế ít nhất một query cần metadata filter.
-- Thu kết quả top-3 và câu trả lời agent của cả ba thành viên.
+- Thu kết quả top-3 và câu trả lời agent của cả bốn thành viên.
 - Chấm từng câu theo thang 0–2 điểm và tổng hợp vào `REPORT_NHOM.md`.
 
 ### Hai tài liệu phụ trách ban đầu
@@ -176,7 +179,7 @@ language: vi
 - [ ] Cả 5 gold answer đều trích được từ corpus.
 - [ ] Không dùng kiến thức ngoài tài liệu để viết gold answer.
 - [ ] Có ít nhất một truy vấn lọc `audience: seller`.
-- [ ] Có bảng điểm của cả ba chiến lược.
+- [ ] Có bảng điểm của cả bốn chiến lược.
 - [ ] Có ít nhất một failure case và giải thích nguyên nhân.
 
 ---
@@ -188,7 +191,7 @@ language: vi
 - Chạy `ChunkingStrategyComparator().compare()` trên 2–3 tài liệu.
 - Tổng hợp số chunk, độ dài trung bình và đánh giá độ mạch lạc.
 - Viết custom chunker chia theo heading/section.
-- Kiểm tra chiến lược của ba thành viên không trùng nhau.
+- Kiểm tra chiến lược của bốn thành viên không trùng nhau.
 - Tổng hợp ưu, nhược điểm và giải thích chiến lược tốt nhất.
 - Chuẩn bị luồng demo retrieval cho nhóm.
 
@@ -232,13 +235,39 @@ Mỗi chunk cần giữ tiêu đề cùng nội dung bên dưới để truy v�
 
 - [ ] Có code custom chunker chạy được.
 - [ ] Có baseline của ba chunker có sẵn.
-- [ ] Có bảng so sánh ba thành viên.
+- [ ] Có bảng so sánh bốn thành viên.
 - [ ] Có nhận xét vì sao heading chunking phù hợp hoặc không phù hợp.
 - [ ] Có demo một query thường và một query dùng metadata filter.
 
 ---
 
-## 5. Công việc cá nhân bắt buộc cho cả ba người
+## Người 4 — R4 Evaluation & Report Lead
+
+### Trách nhiệm nhóm
+
+- Kiểm tra cách chấm benchmark ở mức nội dung, không chỉ dựa vào `doc_id`.
+- Chạy A/B câu hỏi metadata khi có và không có `audience` filter.
+- Tổng hợp ít nhất một failure case thật gồm câu hỏi, nguyên nhân và cách cải thiện.
+- Rà soát tính nhất quán giữa số liệu benchmark và `REPORT_NHOM.md`.
+- Hoàn thiện kịch bản demo, phân chia thời lượng và chuẩn bị câu hỏi phản biện.
+
+### Chiến lược riêng
+
+- Dùng `SentenceChunker(max_sentences_per_chunk=3)`.
+- Giữ nguyên dấu câu khi tách và ghi rõ hạn chế với chữ viết tắt, số thập phân hoặc câu pháp lý dài.
+- Chạy đúng 6 tài liệu, 5 query, gold answer, embedding và metadata filter chung của nhóm.
+
+### Điều kiện hoàn thành
+
+- [ ] Có file kết quả benchmark của SentenceChunker.
+- [ ] Có bảng A/B metadata filter.
+- [ ] Có failure analysis và đề xuất sửa.
+- [ ] Báo cáo nhóm không còn số liệu mâu thuẫn.
+- [ ] Kịch bản demo có phần trình bày của cả bốn thành viên.
+
+---
+
+## 5. Công việc cá nhân bắt buộc cho cả bốn người
 
 Mỗi người tự hoàn thiện các phần sau trên nhánh cá nhân:
 
@@ -320,7 +349,7 @@ doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permi
 
 ## Checkpoint 1 — Khởi động
 
-- [ ] Điền tên ba thành viên và tạo ba nhánh.
+- [ ] Điền tên bốn thành viên và tạo bốn nhánh.
 - [ ] Cài dependency bằng Python 3.11.
 - [ ] Chạy test ban đầu và lưu kết quả.
 - [ ] Chốt sáu URL dự kiến.
@@ -345,13 +374,13 @@ doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permi
 ## Checkpoint 4 — Thiết kế chiến lược
 
 - [ ] R3 có baseline trên 2–3 tài liệu.
-- [ ] Ba người chốt tham số/thuật toán riêng.
+- [ ] Bốn người chốt tham số/thuật toán riêng.
 - [ ] Custom heading chunker chạy được.
 
 ## Checkpoint 5 — Benchmark
 
 - [ ] R2 chốt 5 query và gold answer.
-- [ ] Cả ba chạy đúng cùng corpus và cùng 5 query.
+- [ ] Cả bốn chạy đúng cùng corpus và cùng 5 query.
 - [ ] Lưu top-3, score và agent answer.
 - [ ] Chạy A/B filtered và unfiltered cho query seller.
 - [ ] Ghi nhận ít nhất một failure case.
@@ -361,6 +390,7 @@ doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permi
 - [ ] R1 hoàn thiện phần dữ liệu của báo cáo nhóm.
 - [ ] R2 hoàn thiện phần benchmark và bảng điểm.
 - [ ] R3 hoàn thiện phần so sánh chiến lược và demo.
+- [ ] R4 hoàn thiện phần đánh giá lỗi, báo cáo và kịch bản demo.
 - [ ] Cả nhóm review `REPORT_NHOM.md`.
 - [ ] Mỗi người hoàn thiện `REPORT_CANHAN.md` riêng.
 - [ ] Chạy test lần cuối trước khi nộp.
@@ -371,7 +401,7 @@ doc_id,file_path,title,source_url,retrieved_at,document_version,license_or_permi
 
 1. Giới thiệu chủ đề và corpus trong 30–45 giây.
 2. Cho xem metadata `buyer` và `seller` trong hai tài liệu mẫu.
-3. Trình bày ngắn ba chiến lược chunking.
+3. Trình bày ngắn bốn chiến lược chunking.
 4. Chạy một query dành cho buyer và hiển thị top-3.
 5. Chạy query dành cho seller khi chưa filter.
 6. Chạy lại với `metadata_filter={"audience": "seller"}`.
